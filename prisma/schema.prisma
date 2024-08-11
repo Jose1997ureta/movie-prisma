@@ -1,0 +1,137 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+
+model User {
+  id Int @id @default(autoincrement())
+  name String
+  lastName String
+  username String @unique
+  email String @unique
+  password String 
+  image String
+
+  userMovieFavorite UserMovieFavorite[]
+}
+
+model Gender {
+  id Int @id @default(autoincrement())
+  key_gender String
+  name String 
+  color1 String
+  color2 String
+
+  movieGender MovieGender[]
+}
+
+model Character {
+  id Int @id @default(autoincrement())
+  name String 
+  imagen String
+
+  movieCharacter MovieCharacter[]
+}
+
+model Tag {
+  id Int @id @default(autoincrement())
+  name String 
+
+
+  movieTag MovieTag[]
+}
+
+model Type {
+  id Int @id @default(autoincrement())
+  name String 
+  movie Movie[]
+}
+
+
+model Movie {
+  id Int @id @default(autoincrement())
+
+  title String
+  subtitle String
+
+  duration String
+  image String
+  banner String
+
+  idType Int 
+  type Type @relation(fields: [idType], references: [id])
+
+  movieDetail MovieDetail?
+  movieTrailer MovieTrailer[]
+
+  movieCharacter MovieCharacter[]
+  movieTag MovieTag[]
+  movieGender MovieGender[]
+
+  userMovieFavorite UserMovieFavorite[]
+}
+
+
+model MovieDetail {
+  id Int @id @default(autoincrement())
+  nameDirector String
+  description String
+  idMovie Int @unique
+  movie Movie @relation(fields: [idMovie], references: [id])
+}
+
+model MovieCharacter {
+  idMovie Int 
+  movie Movie @relation(fields: [idMovie], references: [id])
+  idCharacter Int 
+  character Character @relation(fields: [idCharacter], references: [id])
+
+  @@id([idMovie,idCharacter])
+}
+
+model MovieTag {
+    idMovie Int
+    movie Movie @relation(fields: [idMovie], references: [id])
+    idTag Int
+    tag Tag @relation(fields: [idTag], references: [id])
+
+    @@id([idMovie, idTag])
+}
+
+model MovieGender {
+    idMovie Int
+    movie Movie @relation(fields: [idMovie], references: [id])
+    idGender Int
+    gender Gender @relation(fields: [idGender], references: [id])
+
+    @@id([idMovie, idGender])
+}
+
+model MovieTrailer {
+  id Int @id @default(autoincrement())
+  url String
+
+  idMovie Int
+  movie Movie @relation(fields: [idMovie], references: [id])
+}
+
+model UserMovieFavorite {
+  idUser Int
+  user User @relation(fields: [idUser], references: [id])
+
+  idMovie Int
+  movie Movie @relation(fields: [idMovie], references: [id])
+
+  @@id([idMovie, idUser])
+}
